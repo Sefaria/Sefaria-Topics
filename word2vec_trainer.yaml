@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fasttext-trainer
+spec:
+  template:
+    spec:
+      volumes:
+      - name: shared-volume
+        emptyDir: {}
+      - name: gcloud-storage-secret
+        secret:
+          secretName: backup-manager-secret
+      - name: script
+        configMap:
+          name: train-word2vec
+          defaultMode: 0744
+      - name:  local-settings-noah
+        secret:
+          secretName: local-settings-noah
+
+      initContainers:
+      - name: downloader
+        image: google/cloud-sdk
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /storage
+        - name: gcloud-storage-secret
+          mountPath: /conf
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /conf/BackupManagerKey.json
+        command: ["bash"]
+        args: ["-c", "gcloud auth activate-service-account --key-file ${GOOGLE_APPLICATION_CREDENTIALS} && gsutil cp gs://development-research/sefaria-export_prefix_refs.json /storage/sefaria-export_prefix_refs.json"]
+      - name: training
+        image: gcr.io/production-deployment/multi_monitor:v2.4.0
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /storage
+        - name: script
+          mountPath: /scripts
+        - mountPath: /settings
+          name: local-settings-noah
+        command: ["bash"]
+        args: ["-c", "pip install gensim && python /scripts/Word2Vec.py -f /storage/sefaria-export_prefix_refs.json"]
+
+      containers:
+      - name: uploader
+        resources:
+          limits:
+            memory: "20.0Gi"
+            cpu: "3500m" 
+          requests:
+            memory: "20.0Gi"
+            cpu: "3500m"
+        image: google/cloud-sdk
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /storage
+        - name: gcloud-storage-secret
+          mountPath: /conf
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /conf/BackupManagerKey.json
+        command: ["bash"]
+        args: ["-c", "gcloud auth activate-service-account --key-file ${GOOGLE_APPLICATION_CREDENTIALS} && gsutil cp OUTPUT_LOCATION_WORD2VEC gs://development-research/word2vec.out"]
+      restartPolicy: Never

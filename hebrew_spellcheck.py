@@ -47,7 +47,7 @@ def we_havent_added_prefix_or_suffix(word):
 
 def determine_beginning_stopword(beginning_stopword):
     """
-    Appends the appropriate beginning stopword.  There are three possibilites,
+    Appends the appropriate beginning stopword.  There are three possibilities,
     therefore the correct option needs to be determine
     :param beginning_stopword: The modified word
     :return: Appropriate beginning stopword

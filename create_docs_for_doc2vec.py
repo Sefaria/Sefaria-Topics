@@ -168,7 +168,7 @@ def remove_dicta_prefix(string, marker):
 
 def remove_punctuation(data):
     """
-    Removes various punctation from Hebrew text.
+    Removes various punctuation from Hebrew text.
     :param data: String of Hebrew Text
     :return: String without punctuation
     """
@@ -236,9 +236,9 @@ def extract_reference(data):
     return data.split(u'~')[0]
 
 
-def concatenate_sematically_linked_segments(topic_ranged_refs, ranged_to_segment):
+def concatenate_semantically_linked_segments(topic_ranged_refs, ranged_to_segment):
     """
-    Combines multiple Sefaria Segments into one larger segment based on sematical meaning
+    Combines multiple Sefaria Segments into one larger segment based on semantical meaning
     :param topic_ranged_refs: List of ranged trefs that define the semantic separation
     :param ranged_to_segment: Nested dict.  First layer points from Ranged Refs to all sub-seg-refs.  The nested dict points from the sub_seg_ref to the text of said sub_seg_ref
     :return: Dict containing semantically define ranged refs corresponding to their concatenated text
@@ -294,8 +294,8 @@ def get_segments(filename):
         else:
             all_data[ref] = data
 
-    all_data.update(concatenate_sematically_linked_segments(tanakh_topic_ranged_refs, tanakh_ranged_to_segment))
-    all_data.update(concatenate_sematically_linked_segments(talmud_topic_ranged_refs, talmud_ranged_to_segment))
+    all_data.update(concatenate_semantically_linked_segments(tanakh_topic_ranged_refs, tanakh_ranged_to_segment))
+    all_data.update(concatenate_semantically_linked_segments(talmud_topic_ranged_refs, talmud_ranged_to_segment))
 
     return all_data
 

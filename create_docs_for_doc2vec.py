@@ -168,7 +168,7 @@ def remove_dicta_prefix(string, marker):
 
 def remove_punctuation(data):
     """
-    Removes various punctation from Hebrew text.
+    Removes various punctuation from Hebrew text.
     :param data: String of Hebrew Text
     :return: String without punctuation
     """
